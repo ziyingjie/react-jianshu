@@ -8,6 +8,11 @@ import {
     Nav,
     NavItem,
     SearchWrapper,
+    SearchInfo,
+    SearchInfoSwitch,
+    SearchInfoTitle,
+    SearchInfoList,
+    SearchInfoItem,
     NavSearch,
     Addition,
     Button
@@ -15,9 +20,42 @@ import {
 
 
 class Header extends Component {
+    getSearchArea() {
+        let { focused, list, page, totalPage, mouseIn, handleMouseEnter, handleMouseLeave, handleChangePage } = this.props;
+
+        const jsList = list.toJS();//由immute对象转化成js对象
+
+        const pageList = [];
+        // 0-9   10-19  20-29
+        if (jsList.length) {
+            for (let i = (page - 1) * 10; i < page * 10; i++) {
+                pageList.push(<SearchInfoItem key={jsList[i]}>{jsList[i]}</SearchInfoItem>)
+            }
+        }
+        if (focused || mouseIn) {
+            return (
+                <SearchInfo
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    <SearchInfoTitle>
+                        热门搜索
+                        <SearchInfoSwitch onClick={() => { handleChangePage(page, totalPage, this.spinIcon) }}>
+                            <i ref={(icon) => { this.spinIcon = icon }} className="iconfont spin">&#xe851;</i>
+                            换一批
+                        </SearchInfoSwitch>
+                    </SearchInfoTitle>
+                    <SearchInfoList>
+                        {pageList}
+                    </SearchInfoList>
+                </SearchInfo>
+            )
+        } else {
+            return null;
+        }
+    };
     render() {
-        console.log(this.props);
-        const { focused, handleInputFocus, handleInputBlur } = this.props;
+        const { list, focused, handleInputFocus, handleInputBlur } = this.props;
         return (
             <HeaderWrapper>
                 <Logo />
@@ -34,11 +72,12 @@ class Header extends Component {
                         >
                             <NavSearch
                                 className={focused ? 'focused' : ''}
-                                onFocus={handleInputFocus}
+                                onFocus={() => handleInputFocus(list)}
                                 onBlur={handleInputBlur}
                             ></NavSearch>
                         </CSSTransition>
                         <i className={focused ? 'focused iconfont zoom' : 'iconfont zoom'}>&#xe614;</i>
+                        {this.getSearchArea()}
                     </SearchWrapper>
                 </Nav>
                 <Addition>
@@ -53,19 +92,46 @@ class Header extends Component {
 //组件和store做链接的时候 store的数据如何映射到props上去 这里的state 指store里的所有数据
 const mapStateToProps = (state) => {
     return {
-        focused: state.get('header').get('focused')
+        focused: state.get('header').get('focused'),
+        list: state.getIn(['header', 'list']),
+        page: state.getIn(['header', 'page']),
+        totalPage: state.getIn(['header', 'totalPage']),
+        mouseIn: state.getIn(['header', 'mouseIn']),
     }
 }
 
 //组件和store做链接的时候 组件要改变store的数据就要调用store.dispatch方法   dispatch 指store.dispatch方法
 const mapDispatchToProps = (dispatch) => {
     return {
-        handleInputFocus() {
+        handleInputFocus(list) {
+            (list.size === 0) && dispatch(actionCreators.getList());
             dispatch(actionCreators.searchFocus());
         },
         handleInputBlur() {
             dispatch(actionCreators.searchBlur());
         },
+        handleMouseEnter() {
+            dispatch(actionCreators.mouseEnter());
+        },
+        handleMouseLeave() {
+            dispatch(actionCreators.mouseLeave());
+        },
+        handleChangePage(page, totalPage, spinIcon) {
+            let originalAngel = spinIcon.style.transform.replace(/[^0-9]/ig, '');
+            console.log(spinIcon, originalAngel);
+            if (originalAngel) {
+                originalAngel = parseInt(originalAngel, 10);
+            } else {
+                originalAngel = 0;
+            }
+            spinIcon.style.transform = `rotate(${originalAngel + 360}deg)`;
+            if (page < totalPage) {
+                dispatch(actionCreators.changePage(page + 1));
+            } else {
+                dispatch(actionCreators.changePage(1));
+
+            }
+        }
     }
 }
 export default connect(mapStateToProps, mapDispatchToProps)(Header)
