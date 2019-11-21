@@ -1,6 +1,6 @@
 {
 	"success": true,
-	"data": {
+	"obj": {
 		"topicList": [{
 			"id": 1,
 			"title": "社会热点",

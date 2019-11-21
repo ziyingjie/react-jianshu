@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import Topic from './components/Topic';
 import List from './components/List';
 import Recommend from './components/Recommend';
 import Writer from './components/Writer';
 
 
-import { 
+import {
 	HomeWrapper,
 	HomeLeft,
 	HomeRight
 } from './style';
+import { actionCreators } from './store';
 
 class Home extends Component {
 	render() {
@@ -27,8 +29,19 @@ class Home extends Component {
 			</HomeWrapper>
 		)
 	}
+	componentDidMount() {
+		this.props.getHomeDate();
+	
+	}
 
 }
+const mapState = (state) => ({
 
+})
+const mapDispatch = (dispatch) => ({
+	getHomeDate() {
+		dispatch(actionCreators.getHomeDate())
+	}
+})
 
-export default Home;
+export default connect(mapState, mapDispatch)(Home);

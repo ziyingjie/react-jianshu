@@ -1,0 +1,1 @@
+export const GET_HOME_TOTAL = 'home/GET_HOME_TOTAL';
