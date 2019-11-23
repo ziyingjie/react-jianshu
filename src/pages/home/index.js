@@ -9,11 +9,15 @@ import Writer from './components/Writer';
 import {
 	HomeWrapper,
 	HomeLeft,
-	HomeRight
+	HomeRight,
+	BackTop
 } from './style';
 import { actionCreators } from './store';
 
 class Home extends Component {
+	handleScroll() {
+		window.scrollTo(0, 0)
+	}
 	render() {
 		return (
 			<HomeWrapper>
@@ -26,21 +30,38 @@ class Home extends Component {
 					<Recommend />
 					<Writer />
 				</HomeRight>
+				{
+					this.props.showTop ? <BackTop onClick={this.handleScroll}>顶部</BackTop> : null
+				}
+
 			</HomeWrapper>
 		)
 	}
 	componentDidMount() {
 		this.props.getHomeDate();
-	
+		this.bindEvents()
 	}
-
+	componentWillUnmount(){
+		window.removeEventListener('scroll', this.props.changeScroll)
+	}
+	bindEvents() {
+		window.addEventListener('scroll', this.props.changeScroll)
+	}
 }
 const mapState = (state) => ({
-
+	showTop: state.getIn(['home', 'showTop'])
 })
 const mapDispatch = (dispatch) => ({
 	getHomeDate() {
 		dispatch(actionCreators.getHomeDate())
+	},
+	changeScroll() {
+		//console.log(document.documentElement.scrollTop);
+		if (document.documentElement.scrollTop > 200) {
+			dispatch(actionCreators.changeScrollTop(true))
+		} else {
+			dispatch(actionCreators.changeScrollTop(false))
+		}
 	}
 })
 

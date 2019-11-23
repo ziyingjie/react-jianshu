@@ -9,7 +9,9 @@ import { GlobalFontStyled } from './statics/iconfont/iconfont';
 
 import Header from './common/header';
 import Home from './pages/home';
-import Detail from './pages/detail';
+import Detail from './pages/detail/loadable.js';
+import Login from './pages/login';
+import Write from './pages/write';
 
 class App extends Component {
   render() {
@@ -18,16 +20,16 @@ class App extends Component {
         <GlobalStyled />
         <GlobalFontStyled />
         <Provider store={store}>
-          <div>
+          <Router>
             <Header />
-            <Router>
-              <div>
-                {/* exact的存在是严格匹配，去掉的话，访问/detail实际会渲染Home，detail两个组件 */}
-                <Route exact path='/' component={Home}></Route>
-                <Route exact path='/detail' component={Detail}></Route>
-              </div>
-            </Router>
-          </div>
+            <div>
+              {/* exact的存在是严格匹配，去掉的话，访问/detail实际会渲染Home，detail两个组件 */}
+              <Route exact path='/' component={Home}></Route>
+              <Route exact path='/login' component={Login}></Route>
+              <Route exact path='/write' component={Write}></Route>
+              <Route exact path='/detail/:id' component={Detail}></Route>
+            </div>
+          </Router>
         </Provider>
       </div>
     )

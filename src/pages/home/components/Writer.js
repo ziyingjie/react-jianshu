@@ -1,9 +1,9 @@
 import React, {
-	Component
+	PureComponent
 } from 'react';
 
 
-class Writer extends Component {
+class Writer extends PureComponent {
 	render() {
 		return (
 			<div>homeWork</div>
